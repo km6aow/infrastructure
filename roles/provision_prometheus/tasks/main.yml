@@ -1,0 +1,24 @@
+---
+#
+# Install Prometheus. This is intended to be run on a server, not the nodes.
+# The nodes already have the prometheus exporter installed.
+
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - prometheus
+
+      services:
+        - prometheus
+
+  - name: Install /etc/prometheus/prometheus.yml
+    ansible.builtin.template:
+      src:  "prometheus.yml.j2"
+      dest: /etc/prometheus/prometheus.yml
+      owner: root
+      group: root
+    become: true
+    notify: Restart prometheus
+

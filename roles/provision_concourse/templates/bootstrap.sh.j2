@@ -1,0 +1,5 @@
+#!/bin/bash
+
+fly login -t bootstrap -c http://{{ inventory_hostname }}:8080/ -u {{ concourse_admin_user }} -p {{ concourse_admin_user }}
+fly -t bootstrap set-team --non-interactive --team-name=km6aow --local-user={{ concourse_admin_user }}
+fly login -t km6aow -c http://{{ inventory_hostname }}:8080/ -u {{ concourse_admin_user }} -p {{ concourse_admin_user }} -n km6aow

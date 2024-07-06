@@ -1,0 +1,883 @@
+{
+  "meta": {
+    "type": "db",
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
+    "canStar": true,
+    "canDelete": true,
+    "slug": "nbam-sites",
+    "url": "/d/eef86fa1-c67a-47b4-bb38-589f2410a638/nbam-sites",
+    "expires": "0001-01-01T00:00:00Z",
+    "created": "2023-11-07T12:46:50-08:00",
+    "updated": "2023-11-16T09:53:07-08:00",
+    "updatedBy": "admin",
+    "createdBy": "admin",
+    "version": 22,
+    "hasAcl": false,
+    "isFolder": false,
+    "folderId": 5,
+    "folderUid": "d34ea42f-c8c1-4c93-b82f-64293707bf17",
+    "folderTitle": "DevAndTest",
+    "folderUrl": "/dashboards/f/d34ea42f-c8c1-4c93-b82f-64293707bf17/dev-and-test",
+    "provisioned": false,
+    "provisionedExternalId": "",
+    "annotationsPermissions": {
+      "dashboard": {
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
+      },
+      "organization": {
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
+      }
+    }
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 4,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+      },
+      "description": "Shows the location of North Bay Mesh Nodes",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "instance"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "job"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "lon"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "lat"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": false
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "Layer 0",
+          "type": "default"
+        },
+        "controls": {
+          "mouseWheelZoom": false,
+          "showAttribution": true,
+          "showDebug": false,
+          "showMeasure": false,
+          "showScale": false,
+          "showZoom": true
+        },
+        "layers": [
+          {
+            "config": {
+              "showLegend": false,
+              "style": {
+                "color": {
+                  "fixed": "dark-green"
+                },
+                "opacity": 0.4,
+                "rotation": {
+                  "fixed": 0,
+                  "max": 360,
+                  "min": -360,
+                  "mode": "mod"
+                },
+                "size": {
+                  "fixed": 8,
+                  "max": 15,
+                  "min": 2
+                },
+                "symbol": {
+                  "fixed": "img/icons/marker/circle.svg",
+                  "mode": "fixed"
+                },
+                "symbolAlign": {
+                  "horizontal": "center",
+                  "vertical": "center"
+                },
+                "text": {
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 12,
+                  "offsetX": 0,
+                  "offsetY": 0,
+                  "textAlign": "center",
+                  "textBaseline": "middle"
+                }
+              }
+            },
+            "location": {
+              "mode": "auto"
+            },
+            "name": "Nodes",
+            "tooltip": true,
+            "type": "markers"
+          }
+        ],
+        "tooltip": {
+          "mode": "details"
+        },
+        "view": {
+          "allLayers": true,
+          "id": "coords",
+          "lat": 38.347857,
+          "lon": -122.691303,
+          "zoom": 8.83
+        }
+      },
+      "pluginVersion": "10.2.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "disableTextWrap": false,
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "node_aredn_info{lat!=\"\", lon!=\"\", job=\"nbam-site-survey\"} == on(instance,job) group_left(channel) node_aredn_meshrf",
+          "format": "table",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "NBAM Site Map",
+      "transformations": [
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "channel",
+                "firmware_version",
+                "instance",
+                "job",
+                "lat",
+                "lon",
+                "model",
+                "node",
+                "description"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "board_id": 2,
+              "channel": 4,
+              "description": 1,
+              "firmware_version": 3,
+              "instance": 5,
+              "job": 6,
+              "lat": 8,
+              "lon": 9,
+              "model": 7,
+              "node": 0
+            },
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "geomap"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 42,
+      "panels": [
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 12
+          },
+          "id": 116,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 12
+          },
+          "id": 117,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 12
+          },
+          "id": 118,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 12
+          },
+          "id": 119,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 20
+          },
+          "id": 120,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 20
+          },
+          "id": 121,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 20
+          },
+          "id": 122,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 20
+          },
+          "id": 123,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 28
+          },
+          "id": 124,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 28
+          },
+          "id": 125,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 28
+          },
+          "id": 126,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 28
+          },
+          "id": 127,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 36
+          },
+          "id": 128,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 36
+          },
+          "id": 129,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 36
+          },
+          "id": 130,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 36
+          },
+          "id": 131,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 44
+          },
+          "id": 132,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 44
+          },
+          "id": 133,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 44
+          },
+          "id": 134,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 44
+          },
+          "id": 135,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 52
+          },
+          "id": 136,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 52
+          },
+          "id": 137,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 52
+          },
+          "id": 138,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 52
+          },
+          "id": 139,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 60
+          },
+          "id": 140,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 60
+          },
+          "id": 141,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 60
+          },
+          "id": 142,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 60
+          },
+          "id": 143,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 68
+          },
+          "id": 144,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 68
+          },
+          "id": 145,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 68
+          },
+          "id": 146,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 68
+          },
+          "id": 147,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 76
+          },
+          "id": 148,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 76
+          },
+          "id": 149,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 76
+          },
+          "id": 150,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 76
+          },
+          "id": 151,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        },
+        {
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 84
+          },
+          "id": 152,
+          "libraryPanel": {
+            "name": "Error Rates",
+            "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+          },
+          "title": "$node_name"
+        }
+      ],
+      "title": "Site Error Rates",
+      "type": "row"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+        },
+        "definition": "query_result(node_aredn_info)",
+        "hide": 2,
+        "includeAll": true,
+        "label": "Site",
+        "multi": false,
+        "name": "node_name",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(node_aredn_info)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/.*node=\"([^\"]*)*/",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "NBAM Sites",
+  "uid": "eef86fa1-c67a-47b4-bb38-589f2410a638",
+  "version": 22,
+  "weekStart": ""
+}

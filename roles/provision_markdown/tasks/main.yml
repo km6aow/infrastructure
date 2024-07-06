@@ -1,0 +1,29 @@
+---
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - discount
+
+      services: []
+
+  - name: Copy the Apache configuration file
+    ansible.builtin.copy:
+      src: files/etc/
+      dest: /etc
+      owner: root
+      group: root
+    become: true
+    notify: Restart apache2
+
+  - name: Enable external filter module
+    ansible.builtin.shell:
+      cmd: "a2enmod ext_filter"
+    become: true
+
+  - name: Enable markdown
+    ansible.builtin.shell:
+      cmd: "a2enconf markdown"
+    become: true
+    notify: Restart apache2

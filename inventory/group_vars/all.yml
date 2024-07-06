@@ -1,0 +1,48 @@
+---
+# Default password for aredn: "hsmm"
+      aredn_password:               "{{ ANSIBLE_AREDN_PASSWORD }}"
+      aredn_public_key:             "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCq1GzqZG+kfupRTqSLOuLnxKDyCAN7QwniRqmGdjeCIKkIHlrkjBXFwDD2JdlSEIZj7G9LXHUxOo9UOlURHqxd1fGrb0b+PyWx84k06BiYury39vkPtF5ZK/JE7ZLvroZ08PkH2uHjd0/qWP08V1eMA3QiLdiPkIYzpDdBnitTMYoGEWFhkphqP4Z0Z+1K8I3LiNfE6tb0BHhNDCezGT3aFMYSDu6khfSeWscnQh1IKv1PbGU/u5HNhOaL5+WWC2EenpLQIOoohdVpG3gqIeLqp8baeEYwa51NCXzVDePxNKfs4cPCrxosoZLKkTUV9PRwfZFde7dSgtlPYuZsTWHR8lDJ86rwmf6409KxRqCjSYJMOsHiDA3VL8T4OrnprHq+pWWpDrORakyT41JPzGzvK4G4ZZVqz783FybIVcu44tEWwl/Q8yGGkv+lPeSly/PMvTN7+xcwznfWuoWs27jIXbRH6z9ZoiA792oqGNQz2FpbG7vLiBGcb7sK04Bol1s="
+      aredn_username:               "aredn"
+
+      concourse_database:           concourse_db
+      concourse_user:               concourse
+      concourse_password:           "not_so_secret"
+      concourse_vault_token:
+
+      grafana_admin_user:           admin
+
+      packages_to_install:
+        - apache2
+        - docker.io
+        - git
+        - libapache2-mod-perl2
+        - locate
+        - nfs-kernel-server
+        - openntpd
+        - readline-common
+        - rsync
+        - screen
+        - sudo
+        - tree
+        - unzip
+        - vim
+        - wget
+        - zip
+
+      pat:                          "{{ ANSIBLE_GITHUB_TOKEN }}"
+      prometheus_config:
+        nodes:
+        - km6aow-hap-qth
+        - dis.dis.com
+        - gateway.dis.com
+
+      python_version:               39
+      postgresql_version:           16
+
+      services:
+        - apache2.service
+        - docker.service
+
+      ubuntu_netboot_files:         http://cdimage.ubuntu.com/ubuntu-server/daily-live/current/oracular-netboot-amd64.tar.gz
+      ubuntu_version:               24.04
+      ubuntu_iso:                   http://releases.ubuntu.com/{{ ubuntu_version }}/ubuntu-{{ ubuntu_version }}-live-server-amd64.iso

@@ -1,0 +1,12 @@
+---
+
+  - name: Start grafana
+    ansible.builtin.systemd:
+      name: grafana-server
+      state: started
+
+  - name: Enable grafana
+    ansible.builtin.systemd:
+      name: grafana-server
+      enabled: yes
+

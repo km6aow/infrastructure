@@ -1,0 +1,18 @@
+---
+
+  - name: Restart apache2
+    ansible.builtin.service:
+      name: apache2
+      state: restarted
+    become: true
+
+  - name: Restart syslogd
+    ansible.builtin.service:
+      name: syslogd
+      state: restarted
+    become: true
+
+  - name: Cleanup wikidb.sql
+    ignore_errors: true
+    ansible.builtin.shell:
+      cmd: "rm -f /tmp/wikidb.sql"

@@ -1,0 +1,72 @@
+---
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - qemu-kvm
+        - libvirt-clients
+        - libvirt-daemon-system
+        - virt-manager
+
+      services: []
+
+  - name: "Check if the kvm group exists"
+    ansible.builtin.getent:
+      database: group
+      key:      "kvm"
+      fail_key: false
+    register: getent_output
+
+  - debug: var=getent_output
+
+  - name: Set whether not the kvm group exists
+    ansible.builtin.set_fact:
+      kvm_group_exists: "{{ ansible_facts.getent_group['kvm'] is not none }}"
+
+  - name: Initialize aredn_in_kvm_group fact
+    ansible.builtin.set_fact:
+      aredn_in_kvm_group:   false
+
+  - name: Is aredn user in kvm group?
+    ansible.builtin.set_fact:
+      aredn_in_kvm_group: "{{ ansible_facts.getent_group['kvm']['aredn'] is not none }}"
+    when:   kvm_group_exists
+
+  - name: Add user kvm group if needed
+    ansible.builtin.group:
+      name:     "kvm"
+      state:    present
+    become:     true
+    when:       not kvm_group_exists
+
+  - name: "Check if the kvm user exists"
+    ansible.builtin.getent:
+      database: passwd
+      key:     "kvm"
+      fail_key: false
+
+  - name: Set whether not the user exists
+    ansible.builtin.set_fact:
+      kvm_user_exists: "{{ ansible_facts.getent_group['kvm'] is not none }}"
+
+  - name: Add user kvm
+    ansible.builtin.user:
+      name:       "kvm"
+      comment:    "kvm account"
+      groups:     "kvm"
+      system:     true
+      shell:      "/bin/false"
+      createhome: "false"
+    become:       true
+    when:         not kvm_user_exists
+
+  - name: Make sure the aredn user is in the kvm group
+    ansible.builtin.user:
+      name:       "aredn"
+      groups:     "kvm"
+      state:      present
+      append:     yes
+    become:       true
+    when:         not aredn_in_kvm_group
+

@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+    ServerName {{ aredn_hostname }}
+    ServerAdmin admin@localhost
+    DocumentRoot /var/www/html
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+#   Redirect / http://{{ aredn_hostname }}:2000
+    RewriteEngine on
+    RewriteRule ^/$ http://{{ aredn_hostname }}:2000
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

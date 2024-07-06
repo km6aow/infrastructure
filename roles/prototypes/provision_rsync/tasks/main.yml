@@ -1,0 +1,17 @@
+---
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - rsync
+
+      services:
+        - rsync
+
+  - name: Install configuration
+    ansible.builtin.shell:
+      cmd: |
+            npm install abort-controller @turf/turf
+    become: true
+    register: node_output

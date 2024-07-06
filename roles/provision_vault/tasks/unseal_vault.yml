@@ -1,0 +1,33 @@
+---
+# Yeah, I know. This isn't the way it should be done, but I'm the only one using this, so there aren't 2 others
+# to manage keys.
+
+  - name: Grab keys from file
+    ansible.builtin.slurp:
+      src:  '/vault_keys'
+    become: true
+    register: vault_keys
+
+  - name: Transform keys to dict
+    ansible.builtin.set_fact:
+      keys: '{{ vault_keys.content | b64decode | from_json }}'
+
+  - name: Fetch Seal Keys
+    ansible.builtin.set_fact:
+      vault_key1:   '{{ keys["key1"] }}'
+      vault_key2:   '{{ keys["key2"] }}'
+      vault_key3:   '{{ keys["key3"] }}'
+      vault_token:  '{{ keys["token"] }}'
+
+# Yeah, I know. This isn't the way it should be done, but I'm the only one using this, so there aren't 2 others
+# to manage keys.
+  - name: Unseal Vault if needed
+    ansible.builtin.shell: |
+      export VAULT_ADDR="http://127.0.0.1:8200"
+      export VAULT_TOKEN={{ vault_token }}
+      vault operator unseal {{ vault_key1 }}
+      vault operator unseal {{ vault_key2 }}
+      vault operator unseal {{ vault_key3 }}
+      vault secrets enable -path=secret kv
+      echo \*\*\*\*\*\*\*\* Vault Unsealed. Get /root/vault_seal.keys \*\*\*
+    register: vault_status

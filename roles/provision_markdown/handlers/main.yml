@@ -1,0 +1,13 @@
+---
+
+  - name: Restart apache2
+    ansible.builtin.service:
+      name: apache2
+      state: restarted
+    become: true
+
+  - name: Restart syslogd
+    ansible.builtin.service:
+      name: syslogd
+      state: restarted
+    become: true

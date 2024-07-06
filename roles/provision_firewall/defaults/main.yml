@@ -1,0 +1,11 @@
+---
+ansible_user: aredn
+ansible_become: true
+nbam_firewalld_config:
+      - {port: "80", proto: "tcp", state: "enabled", zone: "public" }
+      - {port: "465", proto: "tcp", state: "enabled", zone: "public" }
+      - {port: "993", proto: "tcp", state: "enabled", zone: "public" }
+      - {port: "2000", proto: "tcp", state: "enabled", zone: "public" }
+      - {port: "3000", proto: "tcp", state: "enabled", zone: "public" }
+      - {port: "9090", proto: "tcp", state: "enabled", zone: "public" }
+      - {port: "9100", proto: "tcp", state: "enabled", zone: "public" }

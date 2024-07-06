@@ -1,0 +1,17 @@
+default=autoinstall
+timeout=10
+timeout_style=menu
+menuentry "Ubuntu Live Installer - automated" --id=autoinstall {
+    echo "Loading Kernel..."
+    # make sure to escape the ';' or surround argument in quotes
+    linux /vmlinuz ip=dhcp url=http://${pxe_default_server}/tftp/ubuntu-{{ ubuntu_version }}-live-server-amd64.iso autoinstall ds="nocloud-net;s=http://${pxe_default_server}/tftp/" root=/dev/ram0 cloud-config-url=/dev/null
+    echo "Loading Ram Disk..."
+    initrd /initrd
+}
+menuentry "Ubuntu Live Installer" --id=install {
+    echo "Loading Kernel..."
+    linux /vmlinuz ip=dhcp url=http://${pxe_default_server}/tftp/ubuntu-{{ ubuntu_version }}-live-server-amd64.iso root=/dev/ram0 cloud-config-url=/dev/null
+    echo "Loading Ram Disk..."
+    initrd /initrd
+}
+

@@ -1,0 +1,32 @@
+---
+  - name: Determine installed apps
+    ansible.builtin.apt:
+      list: installed
+    register: apt_apps
+
+  - name: Initialize firewalld_installed property
+    ansible.builtin.set_fact:
+      firewalld_installed: false
+
+  - name: See if firewalld is installed
+    ansible.builtin.set_fact:
+      not_used: false
+    with_items: "{{ apt_apps | json_query(\"results[?name=='firewalld']\") }}"
+    register: firewalld_found
+    ignore_errors: true
+
+  - name: Set firewalld_installed property to true if found
+    ansible.builtin.set_fact:
+      firewalld_installed: true
+    when:  firewalld_found.results | length > 0
+
+  - name: Enable ports in firewalld
+    ansible.builtin.firewalld:
+      permanent:  yes
+      immediate:  yes
+      port:       "{{ item.port }}/{{ item.proto | default('tcp') }}"
+      protocol:   "{{ item.proto | default('tcp') }}"
+      state:      "{{ item.state | default('disabled') }}"
+      zone:       "{{ item.zone  | default('public') }}"
+    with_items:   "{{ nbam_firewalld_config }}"
+    when: firewalld_installed

@@ -1,0 +1,179 @@
+---
+#
+# Set up PXE boot server
+
+#
+# Warning: These need to be solved:
+# 127.0.1.1 ubuntu-vm should not exist in /etc/hosts
+
+
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - dnsmasq
+#       - pxelinux
+        - syslinux-common
+        - grub-efi-amd64-signed
+      services: 
+        - dnsmasq
+
+# - name: Disable systemd-resolved
+#   ansible.builtin.systemd:
+#     name: systemd-resolved
+#     state: stopped
+#     masked: true
+#     enabled: false
+#   become: true
+
+# - name: Remove /etc/resolv.conf link
+#   ansible.builtin.file:
+#     name: /etc/resolv.conf
+#     state: absent
+#   become: true
+
+# - name: Create new /etc/resolv.conf
+#   ansible.builtin.copy:
+#     dest: /etc/resolv.conf
+#     owner: root
+#     group: root
+#     mode: u=rw,g=r,o=r
+#     content: |
+#       nameserver 8.8.8.8
+#       nameserver 10.10.1.1
+#   become: true
+
+  - name: Make sure various directories exist
+    ansible.builtin.file:
+      name: "{{ item }}"
+      state: directory
+    with_items:
+      - '/etc/dnsmasq.d'
+      - "/home/{{ aredn_username }}/Downloads"
+      - '/var/lib/tftpboot'
+      - '/var/lib/tftpboot/grub'
+      - '/mnt'
+#     - '/var/lib/tftpboot/pxelinux.cfg'
+    become: true
+
+  - name: Install /etc/apache2/conf-available/tftp.conf
+    ansible.builtin.copy:
+      src:  "files/etc/"
+      dest: /etc/
+      owner: root
+      group: root
+    become: true
+
+  - name: Enable tftp path in Apache
+    ansible.builtin.shell:
+      cmd: "a2enconf tftp"
+    become: true
+    notify: Restart apache2
+
+  - name: Install /etc/dnsmasq.d/pxe.conf
+    ansible.builtin.template:
+      src:  "pxe.conf.j2"
+      dest: /etc/dnsmasq.d/pxe.conf
+      owner: root
+      group: root
+    become: true
+    notify: Restart dnsmasq
+
+  - name: Install Ubuntu Netboot Files
+    ansible.builtin.unarchive:
+      src: "{{ ubuntu_netboot_files }}"
+      dest: /var/lib/tftpboot
+      remote_src: yes
+      extra_opts:
+        - "--strip-components=2"
+    become: true
+
+# - name: Install /var/lib/tftpboot/pxelinux.cfg/default
+#   ansible.builtin.template:
+#     src:  "pxelinux.cfg.j2"
+#     dest: /var/lib/tftpboot/pxelinux.cfg/default
+#     owner: root
+#     group: root
+#   become: true
+
+  - name: Install /var/lib/tftpboot/grub/grub.cfg
+    ansible.builtin.template:
+      src:  "grub.cfg.j2"
+      dest: /var/lib/tftpboot/grub/grub.cfg
+      owner: root
+      group: root
+    become: true
+
+  - name: See if ISO exists
+    ansible.builtin.stat:
+      path: /var/lib/tftpboot/ubuntu-{{ ubuntu_version }}-live-server-amd64.iso
+    register: ubuntu_stat
+
+  - set_fact:
+      must_download: true
+
+  - set_fact:
+      must_download: false
+    when:
+      ubuntu_stat.stat.exists == true
+
+  - debug: var=must_download
+
+  - name: Download ubuntu-{{ ubuntu_version }}-live-server-amd64.iso
+    ansible.builtin.get_url:
+      url: "{{ ubuntu_iso }}"
+      dest: /var/lib/tftpboot
+    when: must_download == true
+    become: true
+
+  - name: Mount the ISO
+    ansible.posix.mount:
+      src: "/var/lib/tftpboot/ubuntu-{{ ubuntu_version }}-live-server-amd64.iso"
+      path: /mnt
+      fstype: iso9660
+      opts: ro,noauto
+      state: mounted
+    become: true
+    notify: Unmount the ISO
+
+  - name: Copy required files
+    ansible.builtin.copy:
+      remote_src: true
+      src: "{{ item }}"
+      dest: /var/lib/tftpboot
+      owner: root
+      group: root
+    become: true
+    with_items:
+      - /mnt/EFI/boot/bootx64.efi
+#     - /mnt/EFI/boot/grubx64.efi
+      - /mnt/casper/initrd
+      - /usr/lib/syslinux/modules/bios/ldlinux.c32
+      - /mnt/casper/vmlinuz
+
+  - name: Copy the grubnetx64.efi into place
+    ansible.builtin.copy:
+      remote_src: true
+      src: "/usr/lib/grub/x86_64-efi-signed/grubnetx64.efi.signed"
+      dest: /var/lib/tftpboot/grubx64.efi
+      owner: root
+      group: root
+    become: true
+
+  - name: Install /var/lib/tftpboot/user-data
+    ansible.builtin.template:
+      src:  "user-data.j2"
+      dest: /var/lib/tftpboot/user-data
+      owner: root
+      group: root
+    become: true
+
+  - name: Install /var/lib/tftpboot/{meta-data,vendor-data}
+    ansible.builtin.file:
+      name: "{{ item }}"
+      state: touch
+    with_items:
+      - /var/lib/tftpboot/meta-data
+      - /var/lib/tftpboot/vendor-data
+    become: true

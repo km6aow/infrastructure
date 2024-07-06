@@ -1,0 +1,734 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 17,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 116,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.2.1",
+      "repeat": "node_name",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "instant": false,
+          "legendFormat": "RX Errors",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_fifo_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "RX FIFO Errors",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_frame_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "RX Frame Errors",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_collision_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX Collision Errors",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_drop_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX Total Drops",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX Errors",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_fifo_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX FIFO Errors",
+          "range": true,
+          "refId": "G"
+        }
+      ],
+      "title": "$node_name",
+      "type": "state-timeline"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 72
+      },
+      "id": 131,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 80
+      },
+      "id": 119,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 88
+      },
+      "id": 130,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 96
+      },
+      "id": 129,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 104
+      },
+      "id": 135,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 112
+      },
+      "id": 118,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 120
+      },
+      "id": 134,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 128
+      },
+      "id": 133,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 136
+      },
+      "id": 139,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 144
+      },
+      "id": 143,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 152
+      },
+      "id": 117,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 160
+      },
+      "id": 138,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 168
+      },
+      "id": 137,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 176
+      },
+      "id": 147,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 184
+      },
+      "id": 151,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 192
+      },
+      "id": 141,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 200
+      },
+      "id": 142,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 208
+      },
+      "id": 120,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 216
+      },
+      "id": 145,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 224
+      },
+      "id": 146,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 232
+      },
+      "id": 121,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 240
+      },
+      "id": 149,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 248
+      },
+      "id": 150,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 256
+      },
+      "id": 123,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 264
+      },
+      "id": 122,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 272
+      },
+      "id": 125,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 280
+      },
+      "id": 126,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 288
+      },
+      "id": 127,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 296
+      },
+      "id": 124,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 304
+      },
+      "id": 128,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 312
+      },
+      "id": 132,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 320
+      },
+      "id": 136,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 328
+      },
+      "id": 140,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 336
+      },
+      "id": 144,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 344
+      },
+      "id": 148,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    },
+    {
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 352
+      },
+      "id": 152,
+      "libraryPanel": {
+        "name": "Error Rates",
+        "uid": "f8055c76-f45c-473b-a2dc-5a956a4b656d"
+      },
+      "title": "$node_name"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+        },
+        "definition": "query_result(node_aredn_info)",
+        "hide": 2,
+        "includeAll": true,
+        "label": "Site",
+        "multi": false,
+        "name": "node_name",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(node_aredn_info)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/.*node=\"([^\"]*)*/",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Site Error Rates Copy",
+  "uid": "adnsj88g3u6m8c",
+  "version": 2,
+  "weekStart": ""
+}

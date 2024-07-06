@@ -1,0 +1,19 @@
+---
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - nodejs
+        - node-debug
+        - node-fetch
+        - npm
+
+      services: []
+
+  - name: Install abort-controller
+    ansible.builtin.shell:
+      cmd: |
+            npm install abort-controller @turf/turf
+    become: true
+    register: node_output

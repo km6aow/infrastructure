@@ -1,0 +1,265 @@
+{
+  "meta": {
+    "type": "db",
+    "canSave": true,
+    "canEdit": true,
+    "canAdmin": true,
+    "canStar": true,
+    "canDelete": true,
+    "slug": "data-and-error-rates",
+    "url": "/d/f307d869-8c26-46bd-9a83-c82145f1d852/data-and-error-rates",
+    "expires": "0001-01-01T00:00:00Z",
+    "created": "2023-11-13T14:34:09-08:00",
+    "updated": "2023-12-06T13:51:50-08:00",
+    "updatedBy": "admin",
+    "createdBy": "admin",
+    "version": 8,
+    "hasAcl": false,
+    "isFolder": false,
+    "folderId": 5,
+    "folderUid": "d34ea42f-c8c1-4c93-b82f-64293707bf17",
+    "folderTitle": "DevAndTest",
+    "folderUrl": "/dashboards/f/d34ea42f-c8c1-4c93-b82f-64293707bf17/dev-and-test",
+    "provisioned": false,
+    "provisionedExternalId": "",
+    "annotationsPermissions": {
+      "dashboard": {
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
+      },
+      "organization": {
+        "canAdd": true,
+        "canEdit": true,
+        "canDelete": true
+      }
+    }
+  },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 11,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "fillOpacity": 70,
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineWidth": 0,
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "alignValue": "left",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "mergeValues": true,
+        "rowHeight": 0.9,
+        "showValue": "auto",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "10.2.1",
+      "repeat": "node_name",
+      "repeatDirection": "h",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "instant": false,
+          "legendFormat": "RX Errors",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_fifo_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "RX FIFO Errors",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_receive_frame_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "RX Frame Errors",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_collision_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX Collision Errors",
+          "range": true,
+          "refId": "D"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_drop_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX Total Drops",
+          "range": true,
+          "refId": "E"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX Errors",
+          "range": true,
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_fifo_errors_total{device=\"wlan0\", instance=~\"(?i:($node_name)):80\"}[15m])",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "TX FIFO Errors",
+          "range": true,
+          "refId": "G"
+        }
+      ],
+      "title": "$node_name",
+      "type": "state-timeline"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "cb3b8c56-f187-4689-9328-ea2119540643"
+        },
+        "definition": "query_result(node_uname_info)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Node",
+        "multi": false,
+        "name": "node_name",
+        "options": [],
+        "query": {
+          "qryType": 3,
+          "query": "query_result(node_uname_info)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "/.*nodename=\"(.*)\".*/",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Data and Error Rates",
+  "uid": "f307d869-8c26-46bd-9a83-c82145f1d852",
+  "version": 8,
+  "weekStart": ""
+}

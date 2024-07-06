@@ -1,0 +1,29 @@
+log-dhcp
+log-queries
+
+interface={{ dnsmasq_network_interface }}
+bind-interfaces
+
+dhcp-match=set:efi-x86_64,option:client-arch,7
+dhcp-match=set:efi-x86_64,option:client-arch,9
+
+dhcp-range={{ dnsmasq_network_interface }},{{ dnsmasq_network_dhcp }}
+
+dhcp-no-override
+
+{% if dnsmasq_proxy is defined and dnsmasq_proxy == true %}
+
+# If doing dhcp proxy, you will need to make sure your primary dhcp
+# server sends "next-server" with the IP address of the tftp server.
+# There is a bug in grub that will prevent it from working in proxy
+# mode without that.
+#
+pxe-service=tag:efi-x86_64,x86-64_EFI, "Boot UEFI PXE-64 from network", bootx64.efi
+
+{% endif %}
+dhcp-boot=tag:efi-x86_64,bootx64.efi
+
+enable-tftp
+tftp-root=/var/lib/tftpboot
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

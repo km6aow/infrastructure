@@ -1,0 +1,52 @@
+---
+  - name: Check installed packages
+    ansible.builtin.package_facts:
+      manager: auto
+    no_log: true
+
+  - ansible.builtin.set_fact:
+      full_version: 'postgresql-{{ postgresql_version }}'
+
+  - ansible.builtin.set_fact:
+      must_install: "{{ ansible_facts.packages[full_version] is none }}"
+
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - "{{ full_version }}"
+
+      services: []
+
+  - name: Overwrite the default pg_hba
+    ansible.builtin.copy:
+      src: files/etc/postgresql/pg_hba.conf
+      dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+      owner: root
+      group: root
+    become: true
+
+  - name: Overwrite the listen_addresses
+    ansible.builtin.copy:
+      src: files/etc/postgresql/listen.conf
+      dest: "/etc/postgresql/{{ postgresql_version }}/main/conf.d/listen.conf"
+      owner: root
+      group: root
+    become: true
+
+  - name: Change file ownership
+    ansible.builtin.file:
+      path: "{{ item }}"
+      owner: postgres
+      group: postgres
+    become: true
+    with_items:
+      - "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
+      - "/etc/postgresql/{{ postgresql_version }}/main/conf.d/listen.conf"
+
+  - name: Restart Postgres
+    ansible.builtin.systemd:
+      name: postgresql
+      state: restarted
+    become: true

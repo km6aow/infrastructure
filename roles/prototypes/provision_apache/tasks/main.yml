@@ -1,0 +1,157 @@
+---
+# 
+# Assumptions:
+#   Certificates in /etc/mail/certs have been created.
+#   LetsEncrypt has been initialized.
+#
+  - name: Print some debug information
+    vars:
+      msg: |
+        Module Variables ("vars"):
+        --------------------------------
+        {{ vars | to_nice_json }}
+
+        Environment Variables ("environment"):
+        --------------------------------
+        {{ environment | to_nice_json }}
+
+        GROUP NAMES Variables ("group_names"):
+        --------------------------------
+        {{ group_names | to_nice_json }}
+
+        GROUPS Variables ("groups"):
+        --------------------------------
+        {{ groups | to_nice_json }}
+
+        HOST Variables ("hostvars"):
+        --------------------------------
+        {{ hostvars | to_nice_json }}
+
+    debug:
+      msg: "{{ msg.split('\n') }}"
+
+  - name: Create users if needed
+    include_role:
+      name: provision_users
+    vars:
+      groups_to_add:
+        - name:  www
+          gid:   80
+        - name:  webmast
+      users_to_add:
+        - name: webmast
+  
+  - name: Install Apache24 and friends
+    include_role:
+      name: provision_packages
+    vars:
+      packages:
+        - apache24
+        - apcupsd
+        - bandwidthd
+        - drupal9
+        - mod_php81
+        - mrtg
+        - net-snmp
+        - php81
+        - php81-pdo
+        - php81-pdo_pgsql
+
+  - name: Enable things in /etc/rc.conf
+    include_role:
+      name: provision_rc
+    vars:
+      sysrc:
+        apache24_enable:    'YES'
+        apcupsd_enable:     'YES'
+        bandwidthd_enable:  'YES'
+        snmpd_enable:       'YES'
+
+  - name: Install php.ini
+    ansible.builtin.copy:
+      src: /usr/local/etc/php.ini-production
+      dest: /usr/local/etc/php.ini
+      remote_src: yes
+
+  - name: Copy /usr/local/etc for Apache24 and PHP
+    ansible.builtin.copy:
+      src: files/usr/
+      dest: /usr
+      owner: root
+      group: wheel
+
+  - name: Copy /etc 
+    ansible.builtin.copy:
+      src: files/etc/
+      dest: /etc
+      owner: root
+      group: wheel
+
+  - name: Install /usr/local/etc/apache24/Includes configuration file
+    ansible.builtin.template:
+      src:  "apache.conf.j2"
+      dest: /usr/local/etc/apache24/Includes/dis.conf
+      owner: root
+      group: wheel
+
+  - name: Sync /usr/local/www/htdocs
+    ansible.builtin.synchronize:
+      src: files/{{ apache_config.hostname }}/htdocs/
+      dest: /usr/local/www/apache24
+      recursive: true
+      perms: true
+
+  - name: Change file ownership, group and permissions
+    ansible.builtin.file:
+      path: /usr/local/www/apache24/htdocs
+      recurse: true
+      owner: www
+      group: www
+
+  - name: Sync /usr/local/www/drupal9
+    ansible.builtin.synchronize:
+      src: files/{{ apache_config.hostname }}/drupal9/
+      dest: /usr/local/www/drupal9
+      recursive: true
+      perms: true
+
+  - name: Change file ownership, group and permissions
+    ansible.builtin.file:
+      path: /usr/local/www/drupal9
+      recurse: true
+      owner: www
+      group: www
+
+  - name: Change file ownership for /usr/local/www/apache24/passwd
+    ansible.builtin.file:
+      path: /usr/local/www/apache24/passwd
+      owner: root
+      group: www
+      mode: u=rwx,g=rx
+
+  - name: Change file ownership for /usr/local/www/apache24/passwd/passwords
+    ansible.builtin.file:
+      path: /usr/local/www/apache24/passwd/passwords
+      owner: root
+      group: www
+      mode: u=rw,g=r
+
+  - name: Start services
+    ansible.builtin.service:
+      name: "{{ item }}"
+      state: started
+    with_items:
+      - apache24
+      - apcupsd
+      - bandwidthd
+      - snmpd
+
+  - name: Restart syslogd
+    ansible.builtin.service:
+      name:  syslogd
+      state: restarted
+
+  - name: Configure mrtg
+    ansible.builtin.shell:
+      cmd: '/usr/local/bin/cfgmaker --global "WorkDir: /usr/local/www/apache24/htdocs/mrtg" --global "Options[_]: bits,growright" --output /usr/local/www/apache24/htdocs/mrtg/mrtg.cfg community@{{ apache_config.hostname }}'
+

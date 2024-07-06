@@ -1,0 +1,1 @@
+*/5     *       *       *       *       root    env LANG=C /usr/local/bin/mrtg  /usr/local/www/apache24/htdocs/mrtg/mrtg.cfg

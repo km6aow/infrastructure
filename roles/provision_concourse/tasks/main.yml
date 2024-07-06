@@ -1,0 +1,163 @@
+---
+  - name: Check installed packages
+    ansible.builtin.package_facts:
+      manager: auto
+    no_log: true
+
+  - ansible.builtin.set_fact:
+      full_version: 'postgresql-{{ postgresql_version }}'
+
+  - ansible.builtin.set_fact:
+      must_install_postgres: "{{ ansible_facts.packages[full_version|quote] is not defined }}"
+
+  - name: Install Postgres if needed
+    include_role:
+      name: provision_postgresql
+    when: must_install_postgres
+
+  - ansible.builtin.set_fact:
+      concourse_database_exists:         false
+
+  - name: See if the concourse database exists
+    community.postgresql.postgresql_info:
+      filter: "databases"
+    become: true
+    become_user: postgres
+    register: db_output
+
+  - ansible.builtin.set_fact:
+      concourse_database_exists: true
+    when: db_output.databases['{{ concourse_database | quote }}'] is defined
+
+  - debug:
+      msg: "Concourse database exists: {{ concourse_database_exists }}"
+
+  - name: Create the database and role if needed
+    ansible.builtin.shell:
+      cmd: |
+           psql --command="create role {{ concourse_user }}"
+           psql --command="alter role {{ concourse_user }} with nosuperuser \
+                                inherit nocreaterole nocreatedb login \
+                                noreplication nobypassrls \
+                                password '{{ concourse_password }}'"
+           psql --command="create database {{ concourse_database }} \
+                                with template = template0 \
+                                encoding='UTF8' \
+                                locale_provider=libc \
+                                locale='en_US.UTF-8'"
+           psql --command="alter database {{ concourse_database }} owner to {{ concourse_user }}"
+    become: true
+    become_user: postgres
+    when: not concourse_database_exists
+    register: seed_output
+
+  - name: Make sure concourse is running
+    ignore_errors: true
+    ansible.builtin.shell:
+      cmd: "pgrep concourse"
+    register: concourse_pid
+
+  - ansible.builtin.set_fact:
+      concourse_running: "{{ concourse_pid.stdout | int > 0 }}"
+
+# - set_fact:
+#     concourse_running: true
+#   when: concourse_pid.stdout | int > 0
+
+  - name: Stop concourse if it is running
+    ansible.builtin.shell:
+      cmd:      docker-compose down
+      chdir:    /etc/concourse
+    when: concourse_running
+    become: true
+
+# - name: Preemptive remove the container
+#   ignore_errors: true
+#   ansible.builtin.shell:
+#     cmd: "docker rm concourse"
+#   become: true
+
+  - name: Fetch or update the container
+    ansible.builtin.shell:
+      cmd: "docker pull concourse/concourse"
+    become: true
+
+  - name: Make sure /etc/concourse exists
+    ansible.builtin.file:
+      path: "{{ item }}"
+      owner: root
+      group: root
+      state: directory
+      mode: u=rwx,g=rx,o=
+    become: true
+    with_items:
+      - /etc/concourse
+      - /etc/concourse/keys/web
+      - /etc/concourse/keys/worker
+
+  - name: Install /etc/concourse/docker-composer.yml
+    ansible.builtin.template:
+      src:  docker-compose.yml.j2
+      dest: /etc/concourse/docker-compose.yml
+      owner: root
+      group: root
+      mode: u=rw,g=r,o=
+    become: true
+
+  - name: Install /etc/concourse/bootstrap.sh
+    ansible.builtin.template:
+      src:  bootstrap.sh.j2
+      dest: /etc/concourse/bootstrap.sh
+      owner: root
+      group: root
+      mode: u=rwx,g=rx,o=
+    become: true
+
+  - name: See if we need to generate the keys
+    ansible.builtin.stat:
+      path: /etc/concourse/keys/web/session_signing_key
+    register: key_stat
+    become: true
+
+  - name: Create the keys
+    ansible.builtin.shell:
+      cmd: |
+             docker run --rm -v "/etc/concourse/keys/web":/keys concourse/concourse \
+                  generate-key -t rsa -f /keys/session_signing_key
+
+             docker run --rm -v "/etc/concourse/keys/web":/keys concourse/concourse \
+                  generate-key -t ssh -f /keys/tsa_host_key
+
+             docker run --rm -v "/etc/concourse/keys/worker":/keys concourse/concourse \
+                  generate-key -t ssh -f /keys/worker_key
+
+             cp ./keys/worker/worker_key.pub ./keys/web/authorized_worker_keys
+             cp ./keys/web/tsa_host_key.pub ./keys/worker
+
+      chdir:    /etc/concourse
+    become: true
+    register: create_keys
+    when: not key_stat.stat.exists
+
+  - debug:
+      var: create_keys
+    when: create_keys is defined
+
+  - name: Start Concourse
+    ansible.builtin.shell:
+      cmd:      docker-compose up --detach
+      chdir:    /etc/concourse
+    become: true
+
+  - name: Pause to give Concourse enough time to start
+    ansible.builtin.pause:
+      echo:     false
+      seconds:  5
+
+  - name: Fetch fly into /usr/local/bin
+    ansible.builtin.get_url:
+      url: "http://{{ inventory_hostname }}:8080/api/v1/cli?arch=amd64&platform=linux"
+      dest: /usr/local/bin/fly
+      mode: u=rwx,g=rx,o=rx
+    become: true
+

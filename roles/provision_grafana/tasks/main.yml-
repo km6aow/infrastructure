@@ -1,0 +1,66 @@
+---
+#
+# Install Grafana. This is intended to be run on a server, not the nodes.
+
+  - name: Make sure gnupg and apt-transport-https are installed
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - gnupg
+        - apt-transport-https
+
+      services: []
+
+  - name: Import the Grafana apt repository key
+    ansible.builtin.apt_key:
+      url: "https://packages.grafana.com/gpg.key"
+      id: "418A7F2FB0E1E6E7EABF6FE8C2E73424D59097AB"
+      state: present
+    become: true
+
+  - name: Import the Grafana apt repository key
+    ansible.builtin.apt_repository:
+      filename: "grafana-stable"
+      repo: "deb https://packages.grafana.com/oss/deb stable main"
+      state: present
+    become: true
+
+# - name: Add the Grafana GPG key and APT repository
+#   ansible.builtin.shell: |
+#     curl https://packages.grafana.com/gpg.key | sudo tee /etc/apt/trusted.gpg.d/grafana.asc
+#     add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
+#   args:
+#     warn: no
+#   become: true
+
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - grafana
+
+      services:
+        - grafana-server
+
+  - name: Copy the various Grafana files
+    ansible.builtin.copy:
+      src: files/etc/
+      dest: /etc
+      owner: root
+      group: root
+    become: true
+
+  - name: Make sure Grafana is running
+    ignore_errors: true
+    ansible.builtin.shell:
+      cmd: "ps -few | fgrep grafana | fgrep -v 'grep' | awk '{print $2}' | head -1"
+    register: Grafana_pid
+
+  - set_fact:
+      Grafana_running: false
+
+  - set_fact:
+      Grafana_running: true
+    when: Grafana_pid.stdout | int > 0

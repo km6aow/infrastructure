@@ -1,0 +1,55 @@
+---
+  - name: Install Required Packages
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - ubuntu-desktop
+
+      services: []
+
+  - name: "Check if the demo group exists"
+    ansible.builtin.getent:
+      database: group
+      key: "demo"
+      fail_key: false
+
+  - name: Set whether not the user group exists
+    ansible.builtin.set_fact:
+      demo_group_exists: "{{ ansible_facts.getent_group['demo'] is not none }}"
+
+  - name: Add user demo group if needed
+    ansible.builtin.group:
+      name: "demo"
+      state: present
+    become: true
+    when: not demo_group_exists
+
+  - name: "Check if the demo user exists"
+    ansible.builtin.getent:
+      database: passwd
+      key: "demo"
+      fail_key: false
+
+  - name: Set whether not the user exists
+    ansible.builtin.set_fact:
+      demo_user_exists: "{{ ansible_facts.getent_group['demo'] is not none }}"
+
+  - name: Add user demo
+    ansible.builtin.user:
+      name: "demo"
+      comment: "demo account"
+      groups: "demo"
+      system: true
+      shell: "/bin/false"
+      createhome: "false"
+    become: true
+    when: not demo_user_exists
+
+  - name: Copy the start GUI script
+    ansible.builtin.copy:
+      src: files/usr/
+      dest: /usr
+      owner: root
+      group: root
+    become: true

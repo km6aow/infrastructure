@@ -1,0 +1,157 @@
+---
+# Install Grafana. This is intended to be run on a server, not the nodes.
+
+  - name: Gather Facts
+    ansible.builtin.setup:
+
+# - debug:
+#     msg: "nolog stuff: {{ 'false' if lookup('env', 'CI') else 'true' }}"
+
+# - debug:
+#     msg: "grafana admin: {{ grafana_admin_user }} pass: {{ grafana_admin_password }}"
+
+  - name: "Check if the grafana group exists"
+    ansible.builtin.getent:
+      database: group
+      key: "grafana"
+      fail_key: false
+
+  - debug:
+      msg: "grafana group getent: {{ ansible_facts.getent_group }}"
+
+  - name: Set whether not the user group exists
+    ansible.builtin.set_fact:
+      grafana_group_exists: "{{ ansible_facts.getent_group['grafana'] is not none }}"
+
+  - name: Add user grafana group if needed
+    ansible.builtin.group:
+      name: "grafana"
+      system: true
+      state: present
+    become: true
+    when: not grafana_group_exists
+
+  - name: "Check if the grafana user exists"
+    ansible.builtin.getent:
+      database: passwd
+      key: "grafana"
+      fail_key: false
+
+  - debug:
+      msg: "grafana group getent: {{ ansible_facts.getent_group }}"
+
+  - name: Set whether not the user exists
+    ansible.builtin.set_fact:
+      grafana_user_exists: "{{ ansible_facts.getent_group['grafana'] is not none }}"
+
+  - name: Add user grafana
+    ansible.builtin.user:
+      name: "grafana"
+      comment: "Grafana account"
+      groups: "grafana"
+      system: true
+      shell: "/bin/false"
+      createhome: "false"
+    become: true
+    when: not grafana_user_exists
+
+  - name: Copy the Grafana configuration
+    ansible.builtin.copy:
+      src: files/etc/
+      dest: /etc
+      owner: grafana
+      group: grafana
+    become: true
+
+  - name: Check installed packages
+    ansible.builtin.package_facts:
+      manager: auto
+
+  - name: See if grafana is installed
+    ansible.builtin.set_fact:
+      grafana_installed: "{{ ansible_facts.packages['grafana'] is not none }}"
+
+  - name: Set user and password facts
+    ansible.builtin.set_fact:
+      admin_user: "{{ grafana_admin_user }}"
+      admin_password: "{{ grafana_admin_password }}"
+
+  - name: Switch to admin user if never installed
+    ansible.builtin.set_fact:
+      admin_user: "admin"
+      admin_password: "admin"
+    when: not grafana_installed
+
+# From api/datasources on nbamserver
+#[
+#  {
+#      "id": 1,
+#          "uid": "cb3b8c56-f187-4689-9328-ea2119540643",
+#          "orgId": 1,
+#          "name": "Prometheus",
+#          "type": "prometheus",
+#          "typeName": "Prometheus",
+#          "typeLogoUrl": "public/app/plugins/datasource/prometheus/img/prometheus_logo.svg",
+#          "access": "proxy",
+#          "url": "http://localhost:9090",
+#          "user": "",
+#          "database": "",
+#          "basicAuth": false,
+#          "isDefault": true,
+#          "jsonData": {
+#              "httpMethod": "POST"
+#          },
+#          "readOnly": false
+#  }
+#]
+
+  - name: Install Grafana
+    ansible.builtin.include_role:
+      name: grafana.grafana.grafana
+    vars:
+      grafana_alerting:     {}
+#     grafana_api_keys:
+#       - name:             "admin"
+#         role:             "Admin"
+#       - name:             "viewer"
+#         role:             "Viewer"
+#       - name:             "editor"
+#         role:             "Editor"
+      grafana_datasources:
+        - name:             "Prometheus"
+          type:             "prometheus"
+          access: "proxy"
+          uid:              "cb3b8c56-f187-4689-9328-ea2119540643"
+          url:              "http://{{ aredn_hostname }}:9090"
+#         basicAuth: true
+#         basicAuthUser:        "{{ grafana_admin_user }}"
+#         basicAuthPassword:    "{{ grafana_admin_password }}"
+          isDefault: true
+          jsonData:
+            tlsAuth: false
+            tlsAuthWithCACert:  false
+            tlsSkipVerify:      true
+      grafana_security:
+        admin_user:         "{{ grafana_admin_user }}"
+        admin_password:     "{{ grafana_admin_password }}"
+      grafana_server:
+        protocol:           http
+
+# - name: Set up Prometheus Datasource
+#   grafana.grafana.datasource:
+#     dataSource: |
+#       {
+#         "name": "Prometheus",
+#         "type": "prometheus",
+#         "access": "proxy",
+#         "url": "http://localhost:9090",
+#         "jsonData": {
+#           "httpMethod": "POST",
+#           "manageAlerts": true,
+#           "prometheusType": "Prometheus",
+#           "cacheLevel": "High"
+#         }
+#       }
+#     grafana_url: "http://localhost:3000"
+#     grafana_api_key: "{{ grafana_api_key }}"
+#     state: present

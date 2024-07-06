@@ -1,0 +1,45 @@
+ServerAdmin webmast@dis.com
+ServerName {{ apache_config.hostname }}
+ServerTokens Prod
+ServerSignature Off
+HostnameLookups On
+AddType application/x-httpd-php .php .phtml
+AddType application/x-httpd-php-source .phps
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+DocumentRoot "/usr/local/www/apache24/htdocs"
+
+{% if apache_config.use_tls %}
+Listen 443
+
+SSLCipherSuite HIGH:!aNULL:!MD5
+SSLProtocol -All +TLSv1.1 +TLSv1.2
+{% endif %}
+
+{% for server_name in apache_config.virtual_hosts -%}
+<VirtualHost {{ apache_config.ipv4_addr }}:{{ apache_config.listen_port }}{% if apache_config.ipv6_addr is defined %} [{{ apache_config.ipv6_addr}}]:{{ apache_config.listen_port }}]{% endif %}>
+    ServerName {{ server_name }}
+    DocumentRoot "{{ apache_config.virtual_hosts[server_name].document_root }}"
+    {% if apache_config.use_tls -%}
+    SSLEngine on
+    SSLCertificateFile "/usr/local/etc/letsencrypt/live/dis.com-0001/fullchain.pem"
+    SSLCertificateKeyFile "/usr/local/etc/letsencrypt/live/dis.com-0001/privkey.pem"
+    {% endif %}
+
+    <Directory "{{ apache_config.virtual_hosts[server_name].document_root }}">
+        Options FollowSymlinks MultiViews
+        AllowOverride All
+        Require all granted
+        RewriteEngine on
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^(.*)$ index.php?q=$1 [L,QSA]
+    </Directory>
+</VirtualHost>
+{% endfor %}

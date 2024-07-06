@@ -1,0 +1,47 @@
+# Inspired and adapted from https://github.com/geerlingguy/docker-ubuntu2404-ansible
+# This container mimics the ubuntu system targeted by the automation
+
+FROM docker.io/geerlingguy/docker-ubuntu2404-ansible:latest
+
+ENV container=docker
+ENV ANSIBLE_BASE_VERSION=2.10.7
+ENV LC_ALL="en_US.UTF-8"
+
+# ENV PYTHON_PIP_VERSION=20.3.4
+
+LABEL Name=Ubuntu24-Ansible Version=${ANSIBLE_VERSION}
+
+# Install systemd -- See https://hub.docker.com/_/ubuntu/
+RUN apt -y update; apt install systemd; apt clean all; \
+(cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i; done); \
+rm -f /lib/systemd/system/multi-user.target.wants/*;\
+rm -f /etc/systemd/system/*.wants/*;\
+rm -f /lib/systemd/system/local-fs.target.wants/*; \
+rm -f /lib/systemd/system/sockets.target.wants/*udev*; \
+rm -f /lib/systemd/system/sockets.target.wants/*initctl*; \
+rm -f /lib/systemd/system/basic.target.wants/*;\
+rm -f /lib/systemd/system/anaconda.target.wants/*;
+
+# Install requirements.
+RUN apt -y update \
+ && apt -y upgrade \
+ && apt -y install \
+      rsync \
+      sudo \
+      wget \
+      which \
+ && rm -fr /var/cache/apt/archives/* \
+ && groupadd --system aredn \
+ && useradd --system --gid aredn --create-home aredn \
+ && echo -e 'Defaults:aredn !requiretty' > /etc/sudoers.d/aredn \
+ && echo -e 'aredn ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers.d/aredn \
+ && mkdir -p /etc/ansible \
+ && echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts \
+ && mkdir -p /etc/ssh/authorized_principals \
+ && echo -e 'aredn.deploy' > /etc/ssh/authorized_principals/aredn \
+ && echo -e 'AuthorizedPrincipalsFile /etc/ssh/authorized_principals/%u' >> /etc/ssh/sshd_config
+
+VOLUME ["/sys/fs/cgroup"]
+# CMD ["/lib/systemd/systemd"]
+
+CMD ["/sbin/init"]

@@ -1,0 +1,25 @@
+---
+
+all:
+  hosts:
+# For local development and testing
+    ubuntu-vm.dis.com:
+
+      aredn_hostname:               ubuntu-vm.dis.com
+
+      concourse_admin_user:         admin
+      concourse_database_user:      concourse
+      concourse_database_password:  "{{ CONCOURSE_DATABASE_PASSWORD }}"
+      concourse_vault_token:        "{{ CONCOURSE_VAULT_TOKEN }}"
+
+      dnsmasq_proxy:                true
+      dnsmasq_network_interface:    enp0s5
+      dnsmasq_network_dhcp:         "10.10.1.50,proxy,255.255.255.0"
+
+      external_network_gateway:     10.10.1.1
+      internal_network_address:     10.10.1.45
+
+      grafana_admin_password:       "{{ GRAFANA_ADMIN_PASSWORD }}"
+
+      ubuntu_iso:                   http://ubuntu-vm.dis.com/ubuntu-{{ ubuntu_version }}-live-server-amd64.iso
+      userdata_network_interface:   enp88s0

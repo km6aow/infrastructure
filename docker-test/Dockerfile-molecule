@@ -1,0 +1,63 @@
+# Inspired and adapted from https://github.com/gaahrdner/docker-molecule
+
+FROM docker:dind
+
+LABEL Name=molecule Version=0.0.1
+
+ENV DOCKER_COMPOSE_VERSION=1.29.2
+ENV ANSIBLE_VERSION=9.5.1
+ENV HASHIVAULT_VERSION=4.6.3
+ENV VAULT_VERSION=1.17.1
+ENV MOLECULE_VERSION=24.6.0
+ENV MOLECULE_DOCKER_VERSION=1.0.2
+ENV PORT=1337
+
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
+    && apk add --update --virtual .deps --no-cache gnupg \
+    && cd /tmp \
+    && wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip \
+    && wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS \
+    && wget https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS.sig \
+    && wget -qO- https://www.hashicorp.com/.well-known/pgp-key.txt | gpg --import \
+    && gpg --verify vault_${VAULT_VERSION}_SHA256SUMS.sig vault_${VAULT_VERSION}_SHA256SUMS \
+    && grep vault_${VAULT_VERSION}_linux_amd64.zip vault_${VAULT_VERSION}_SHA256SUMS | sha256sum -c \
+    && unzip /tmp/vault_${VAULT_VERSION}_linux_amd64.zip -d /tmp \
+    && mv /tmp/vault /usr/local/bin/vault \
+    && rm -f /tmp/vault_${VAULT_VERSION}_linux_amd64.zip vault_${VAULT_VERSION}_SHA256SUMS ${VAULT_VERSION}/vault_${VAULT_VERSION}_SHA256SUMS.sig \
+    && apk del .deps \
+    && apk --update --no-cache add \
+        libcap-setcap \
+        jq \
+        bash \
+        ca-certificates \
+        curl \
+        git \
+        iptables \
+        python3 \
+        py3-pip \
+        rsync \
+        rsyslog \
+        py3-wheel \
+        unzip \
+    && apk --update --no-cache add --virtual \
+        ansible \
+        build-base \
+        cargo \
+        libffi-dev \
+        linux-headers \
+        openssl-dev \
+        python3-dev \
+        py3-boto3 \
+        py3-cffi \
+        py3-digitalocean \
+        zlib-dev \
+    && pip install --no-cache-dir --break-system-packages \
+        ansible-modules-hashivault==${HASHIVAULT_VERSION} \
+        hvac \
+        molecule==${MOLECULE_VERSION} \
+        molecule-docker==${MOLECULE_DOCKER_VERSION} \
+        python-consul
+    # For vault
+RUN setcap cap_ipc_lock= /usr/local/bin/vault \ 
+    && rm -rf /var/cache/apk/* 
+

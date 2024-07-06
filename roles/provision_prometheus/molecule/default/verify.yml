@@ -1,0 +1,39 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+  - name: Assert Prometheus is Up
+    uri:
+      url: http://localhost:9090
+      status_code: 200
+
+  - name: Register Prometheus File
+    shell: cat /etc/prometheus/prometheus.yml
+    register: prometheus_file
+
+  - debug:
+      var: prometheus_file
+
+  # stdout_lines is array of file
+  - assert:
+      that:
+        - "'job_name: streamer' in prometheus_file.stdout"
+        - "'instance:8081' in prometheus_file.stdout"
+        - "'instance:8099' in prometheus_file.stdout"
+        - "'job_name: nodeexporter' in prometheus_file.stdout"
+        - "'instance:9100' in prometheus_file.stdout" # nodeexporter target
+  
+  - name: Register Prometheus Alerts
+    shell: cat /etc/prometheus/abrsm-rules/alerts.yml
+    register: alerts_file
+  
+  - assert:
+      that:
+        - "'alert: vde.system.config.error' in alerts_file.stdout"
+  
+  - name: Assert Node Exporter is Up
+    uri:
+      url: http://localhost:9100/metrics
+      status_code: 200
+

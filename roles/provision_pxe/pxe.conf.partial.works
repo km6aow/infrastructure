@@ -1,0 +1,21 @@
+log-dhcp
+log-queries
+interface=enp0s5
+bind-interfaces
+# dhcp-range=enp0s5,10.10.1.50,10.10.1.59
+# port=0
+dhcp-range=enp0s5,10.10.1.50,proxy,255.255.255.0
+# dhcp-proxy=10.10.1.1
+# dhcp-option=vendor:PXEClient,6,2b
+dhcp-no-override
+# pxe-service=net:#ipxe,x86PC, "Boot from network", pxelinux
+pxe-service=net:#ipxe,x86PC, "Boot from network", pxelinux
+pxe-service=net:#ipxe,BC_EFI, "Boot UEFI from network", bootx64.efi
+pxe-service=net:#ipxe,X86-64_EFI, "Boot UEFI PXE-64 from network", bootx64.efi
+dhcp-match=set:efi-x86_64,option:client-arch,7
+dhcp-boot=tag:efi-x86_64,bootx64.efi
+
+enable-tftp
+tftp-root=/var/lib/tftpboot
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

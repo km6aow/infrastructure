@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  web:
+    image: concourse/concourse
+    command: web
+    ports: ["8080:8080"]
+    volumes:
+      - "/etc/concourse/keys/web:/concourse-keys"
+      - "/var/run/postgresql:/var/run/postgresql"
+    environment:
+      CONCOURSE_EXTERNAL_URL: http://{{ inventory_hostname }}:8080
+      CONCOURSE_POSTGRES_USER: {{ concourse_database_user }}
+      CONCOURSE_POSTGRES_PASSWORD: {{ concourse_database_password }}
+      CONCOURSE_POSTGRES_DATABASE: {{ concourse_database }}
+      CONCOURSE_POSTGRES_SOCKET: /var/run/postgresql
+      CONCOURSE_ADD_LOCAL_USER: {{ concourse_admin_user }}:{{ concourse_admin_user }}
+      CONCOURSE_MAIN_TEAM_LOCAL_USER: {{ concourse_admin_user }}
+      CONCOURSE_VAULT_URL: http://host.docker.internal:8200
+      CONCOURSE_VAULT_CLIENT_TOKEN: {{ concourse_vault_token }}
+      CONCOURSE_VAULT_PATH_PREFIX: /secret
+      CONCOURSE_VAULT_LOOKUP_TEMPLATES: {% raw %}/{{.Team}}/concourse-ci/{{.Pipeline}}/{{.Secret}},/{{.Team}}/concourse-ci/{{.Secret}}{% endraw %}
+
+    extra_hosts:
+      host.docker.internal: host-gateway
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+
+  worker:
+    image: concourse/concourse
+    command: worker
+    privileged: true
+    depends_on: [web]
+    volumes: ["/etc/concourse/keys/worker:/concourse-keys"]
+    links: [web]
+    stop_signal: SIGUSR2
+    environment:
+      CONCOURSE_TSA_HOST: web:2222
+      # enable DNS proxy to support Docker's 127.x.x.x DNS server
+      CONCOURSE_GARDEN_DNS_PROXY_ENABLE: "true"
+    extra_hosts:
+      host.docker.internal: host-gateway
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
