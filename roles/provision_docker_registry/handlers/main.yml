@@ -1,0 +1,8 @@
+---
+  - name: update CA
+    ansible.builtin.shell: update-ca-certificates
+
+  - name: reload nginx
+    ansible.builtin.service:
+      name:     nginx
+      state:    reloaded

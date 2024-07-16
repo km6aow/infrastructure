@@ -1,0 +1,48 @@
+worker_processes auto;
+
+events {
+    worker_connections 1024;
+}
+
+http {
+    client_max_body_size 0;
+    upstream registry {
+        server {{ inventory_hostname }}:5000;
+    }
+
+    server {
+        listen 443 ssl;
+        server_name {{ inventory_hostname }};
+
+        ssl_certificate /etc/nginx/certs/registry.cert;
+        ssl_certificate_key /etc/nginx/certs/registry.key;
+
+        location / {
+            proxy_pass http://registry/v2;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # These headers are required for Docker to trust the registry
+            # certificate and enable client-side certificate validation
+            proxy_ssl_verify on;
+            proxy_ssl_trusted_certificate /etc/nginx/certs/registry.crt;
+            proxy_ssl_session_reuse off;
+        }
+
+        location /v2/ {
+            proxy_pass http://registry;
+            proxy_set_header Host $http_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+
+            # These headers are required for Docker to trust the registry
+            # certificate and enable client-side certificate validation
+            proxy_ssl_verify on;
+            proxy_ssl_trusted_certificate /etc/nginx/certs/registry.crt;
+            proxy_ssl_session_reuse off;
+        }
+    }
+}

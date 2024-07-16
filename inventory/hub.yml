@@ -1,0 +1,12 @@
+---
+
+all:
+  hosts:
+# For local development and testing
+    hub.dis.com:
+
+      aredn_hostname:               ubuntu-vm.dis.com
+
+      external_network_gateway:     10.10.1.1
+      internal_network_address:     10.10.1.45
+

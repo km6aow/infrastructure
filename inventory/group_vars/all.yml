@@ -13,7 +13,6 @@
 
       packages_to_install:
         - apache2
-        - docker.io
         - git
         - libapache2-mod-perl2
         - locate
@@ -41,7 +40,6 @@
 
       services:
         - apache2.service
-        - docker.service
 
       ubuntu_netboot_files:         http://cdimage.ubuntu.com/ubuntu-server/daily-live/current/oracular-netboot-amd64.tar.gz
       ubuntu_version:               24.04

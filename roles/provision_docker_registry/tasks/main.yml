@@ -1,0 +1,127 @@
+---
+  - name: Install /etc/docker/daemon.json
+    ansible.builtin.template:
+      src:      daemon.json.j2
+      dest:     /etc/docker/daemon.json
+      owner:    root
+      group:    root
+      mode:     u=rw,g=r,o=r
+
+  - name: Make sure /etc/nginx and /etc/docker/certs.d and friends exist
+    ansible.builtin.file:
+      path: "{{ item }}"
+      state: directory
+      mode: u=rwx,g=rx
+    with_items:
+      - /etc/docker/auth
+      - /etc/docker/certs
+      - /etc/docker/certs.d
+      - /etc/docker/certs.d/{{ inventory_hostname }}
+      - /etc/nginx
+      - /etc/nginx/certs
+
+  - name: Install /etc/nginx/nginx.conf
+    ansible.builtin.template:
+      src:      nginx.conf.j2
+      dest:     /etc/nginx/nginx.conf
+      owner:    root
+      group:    root
+      mode:     u=rw,g=r,o=r
+
+  - name: Copy the Registry Configuration
+    ansible.builtin.copy:
+      src: files/etc/
+      dest: /etc
+      owner: root
+      group: root
+    notify:
+      - update CA
+
+  - name: See if we need to generate the keys
+    ansible.builtin.stat:
+      path: /etc/docker/certs/registry.key
+    register: key_stat
+
+  - name: Create the keys
+    community.crypto.openssl_privatekey:
+      path:     /etc/docker/certs/registry.key
+      size:     2048
+      owner:    docker
+      group:    docker
+      mode:     0600
+    register:   create_keys
+    when: not key_stat.stat.exists
+
+  - name: Create the CSR
+    community.crypto.openssl_csr_pipe:
+      privatekey_path:  /etc/docker/certs/registry.key
+      common_name:      hub.dis.com
+      subject_alt_name:
+        - "DNS:hub.dis.com"
+    register: csr
+
+  - name: Create the certificate if needed
+    community.crypto.x509_certificate:
+      csr_content:          "{{ csr.csr }}"
+      path:                 /etc/docker/certs/registry.cert
+      privatekey_path:      /etc/docker/certs/registry.key
+      provider:             selfsigned
+      selfsigned_not_after: "+3650d"
+      owner:                docker
+      group:                docker
+      mode:                 0644
+    when: not key_stat.stat.exists
+
+  - name: Copy the certificate to /etc/ssl/certs and /etc/docker/certs.d
+    ansible.builtin.copy:
+      src:          /etc/docker/certs/registry.cert
+      dest:         "{{ item }}"
+      remote_src:   true
+      owner:        root
+      group:        root
+    with_items:
+      - /etc/ssl/certs/registry.pem
+      - /etc/docker/certs.d/{{ inventory_hostname }}/registry.crt
+    notify:
+      - update CA
+    when: not key_stat.stat.exists
+
+  - name: See if we need to generate the htpasswd file
+    ansible.builtin.stat:
+      path: /etc/docker/auth/htpasswd
+    register: htpasswd_stat
+
+  - name: Generate the htpasswd file if needed
+    ansible.builtin.shell: |
+         htpasswd -Bbn admin {{ ANSIBLE_HUB_PASSWORD }} > /etc/docker/auth/htpasswd
+    when: not htpasswd_stat.stat.exists
+
+  - name: Start the registry container
+    community.docker.docker_container:
+      client_cert:                      /certs/registry.cert 
+      client_key:                       /certs/registry.key 
+      image:                            registry
+      name:                             registry
+      ports:
+        - "5000:5000"
+      restart_policy:                   "unless-stopped"
+      state:                            started
+      volumes:
+        - /etc/docker/auth:/auth
+        - /etc/docker/certs:/certs
+      env:
+        REGISTRY_AUTH:                  htpasswd
+        REGISTRY_AUTH_HTPASSWD_PATH:    /auth/htpasswd
+        REGISTRY_AUTH_HTPASSWD_REALM:   "Registry Realm"
+
+  - name: Start the nginx container
+    community.docker.docker_container:
+      image:                            nginx
+      name:                             nginx
+      ports:
+        - "443:443"
+      restart_policy:                   "unless-stopped"
+      state:                            started
+      volumes:
+        - /etc/nginx:/etc/nginx
+        - /etc/docker/certs:/etc/nginx/certs
