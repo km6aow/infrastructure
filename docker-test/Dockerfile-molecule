@@ -4,13 +4,11 @@ FROM docker:dind
 
 LABEL Name=molecule Version=0.0.1
 
-ENV DOCKER_COMPOSE_VERSION=1.29.2
-ENV ANSIBLE_VERSION=9.5.1
 ENV HASHIVAULT_VERSION=4.6.3
-ENV VAULT_VERSION=1.17.1
+ENV HUB_SERVER=ubuntu-vm.dis.com
 ENV MOLECULE_VERSION=24.6.0
-ENV MOLECULE_DOCKER_VERSION=1.0.2
-ENV PORT=1337
+ENV MOLECULE_DOCKER_VERSION=23.5.3
+ENV VAULT_VERSION=1.17.1
 
 RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
     && apk add --update --virtual .deps --no-cache gnupg \
@@ -55,8 +53,11 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositor
         ansible-modules-hashivault==${HASHIVAULT_VERSION} \
         hvac \
         molecule==${MOLECULE_VERSION} \
-        molecule-docker==${MOLECULE_DOCKER_VERSION} \
-        python-consul
+        molecule-plugins[docker]==${MOLECULE_DOCKER_VERSION} \
+        python-consul \
+    && mkdir -p /etc/docker \
+    && echo { \"insecure-registries\" : [ \"${HUB_SERVER}:5000\" ] } > /etc/docker/daemon.json
+
     # For vault
 RUN setcap cap_ipc_lock= /usr/local/bin/vault \ 
     && rm -rf /var/cache/apk/* 

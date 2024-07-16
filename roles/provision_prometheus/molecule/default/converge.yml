@@ -2,30 +2,10 @@
 - name: Converge
   hosts: all
   vars:
-    test_streamer_status: 
-      - "└─5040 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD9/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 13 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8093"
-      - "└─4947 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD8/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 12 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8092"
-      - "└─4861 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD7/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 11 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8091"
-      - "└─4224 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-HD5/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 10 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8090"
-      - "└─4098 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-HD4/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 9 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8089"
-      - "└─4009 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-HD3/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 8 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8088"
-      - "└─3924 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-HD2/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 7 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8087"
-      - "└─11085 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD6/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 6 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8086"
-      - "└─10862 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD5/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 5 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8085"
-      - "└─10482 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD4/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 4 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8084"
-      - "└─9985 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD3/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 3 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8083"
-      - "└─9809 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD2/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 2 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8082"
-      - "└─9315 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-SD1/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 1 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8081"
-      - "└─14281 /opt/vde/bin/streamer --cfg-file /etc/vde/streamer/HITS-HD1/config.json --hostname sdc-dt-hits-s-04-01.vi.comcast.net --instance 0 --trace d -l /etc/vde/libdecrypt/config-stage.json --log-to-stderr --max-program 15 --telemetry-port 8099"
+    test_status:
+      - "foobar"
 
   tasks:
-    # Need to include this as it will add the required repos
-    # These will be setup via the pre-built image but we need
-    # to emulate that here
-    - name: "Include vde_provision_repos"
+    - name: "Include provision_prometheus"
       include_role:
-        name: "vde_provision_repos"
-
-    - name: "Include vde_provision_prometheus"
-      include_role:
-        name: "vde_provision_prometheus"
+        name: "provision_prometheus"

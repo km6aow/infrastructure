@@ -5,7 +5,7 @@ driver:
   name: docker
 platforms:
   - name: instance
-    image: km6aow-molecule:latest
+    image: robertdebock/ubuntu
     tmpfs:
       - /run
       - /tmp
@@ -49,7 +49,6 @@ scenario:
     - destroy
   test_sequence:
     - dependency
-    - lint
     - cleanup
     - destroy
     - syntax
