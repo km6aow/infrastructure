@@ -22,7 +22,6 @@
     ansible.builtin.group:
       name: "demo"
       state: present
-    become: true
     when: not demo_group_exists
 
   - name: "Check if the demo user exists"
@@ -43,7 +42,6 @@
       system: true
       shell: "/bin/false"
       createhome: "false"
-    become: true
     when: not demo_user_exists
 
   - name: Copy the start GUI script
@@ -52,4 +50,3 @@
       dest: /usr
       owner: root
       group: root
-    become: true

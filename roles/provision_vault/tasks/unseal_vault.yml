@@ -5,7 +5,6 @@
   - name: Grab keys from file
     ansible.builtin.slurp:
       src:  '/vault_keys'
-    become: true
     register: vault_keys
 
   - name: Transform keys to dict

@@ -25,7 +25,6 @@
       dest: "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
       owner: root
       group: root
-    become: true
 
   - name: Overwrite the listen_addresses
     ansible.builtin.copy:
@@ -33,14 +32,12 @@
       dest: "/etc/postgresql/{{ postgresql_version }}/main/conf.d/listen.conf"
       owner: root
       group: root
-    become: true
 
   - name: Change file ownership
     ansible.builtin.file:
       path: "{{ item }}"
       owner: postgres
       group: postgres
-    become: true
     with_items:
       - "/etc/postgresql/{{ postgresql_version }}/main/pg_hba.conf"
       - "/etc/postgresql/{{ postgresql_version }}/main/conf.d/listen.conf"
@@ -49,4 +46,3 @@
     ansible.builtin.systemd:
       name: postgresql
       state: restarted
-    become: true

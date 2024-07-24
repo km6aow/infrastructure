@@ -19,6 +19,5 @@
       dest: /etc/prometheus/prometheus.yml
       owner: root
       group: root
-    become: true
     notify: Restart prometheus
 

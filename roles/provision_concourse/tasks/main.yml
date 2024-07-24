@@ -10,10 +10,22 @@
   - ansible.builtin.set_fact:
       must_install_postgres: "{{ ansible_facts.packages[full_version|quote] is not defined }}"
 
+  - ansible.builtin.set_fact:
+      must_install_psycopg2: "{{ ansible_facts.packages['python3-psycopg2'] is not defined }}"
+
   - name: Install Postgres if needed
     include_role:
       name: provision_postgresql
     when: must_install_postgres
+
+  - name: Install python3-psycopg2 if needed
+    include_role:
+      name: provision_packages
+    vars:
+      packages_to_install:
+        - python3-psycopg2
+      services: []
+    when: must_install_psycopg2
 
   - ansible.builtin.set_fact:
       concourse_database_exists:         false
@@ -65,22 +77,28 @@
 #   when: concourse_pid.stdout | int > 0
 
   - name: Stop concourse if it is running
-    ansible.builtin.shell:
-      cmd:      docker-compose down
-      chdir:    /etc/concourse
+    community.docker.docker_compose_v2:
+      project_src:  /etc/concourse
+      state:        absent
     when: concourse_running
-    become: true
+
+#   ansible.builtin.shell:
+#     cmd:      docker-compose down
+#     chdir:    /etc/concourse
+#   when: concourse_running
 
 # - name: Preemptive remove the container
 #   ignore_errors: true
 #   ansible.builtin.shell:
 #     cmd: "docker rm concourse"
-#   become: true
 
   - name: Fetch or update the container
-    ansible.builtin.shell:
-      cmd: "docker pull concourse/concourse"
-    become: true
+    community.docker.docker_image_pull:
+      docker_host:  "unix:///run/docker.sock"
+      name:         concourse/concourse
+
+#   ansible.builtin.shell:
+#     cmd: "docker pull concourse/concourse"
 
   - name: Make sure /etc/concourse exists
     ansible.builtin.file:
@@ -89,20 +107,18 @@
       group: root
       state: directory
       mode: u=rwx,g=rx,o=
-    become: true
     with_items:
       - /etc/concourse
       - /etc/concourse/keys/web
       - /etc/concourse/keys/worker
 
-  - name: Install /etc/concourse/docker-composer.yml
+  - name: Install /etc/concourse/docker-compose.yml
     ansible.builtin.template:
       src:  docker-compose.yml.j2
       dest: /etc/concourse/docker-compose.yml
       owner: root
       group: root
       mode: u=rw,g=r,o=
-    become: true
 
   - name: Install /etc/concourse/bootstrap.sh
     ansible.builtin.template:
@@ -111,15 +127,13 @@
       owner: root
       group: root
       mode: u=rwx,g=rx,o=
-    become: true
 
   - name: See if we need to generate the keys
     ansible.builtin.stat:
       path: /etc/concourse/keys/web/session_signing_key
     register: key_stat
-    become: true
 
-  - name: Create the keys
+  - name: Create the keys (just easier to do it this way)
     ansible.builtin.shell:
       cmd: |
              docker run --rm -v "/etc/concourse/keys/web":/keys concourse/concourse \
@@ -135,7 +149,6 @@
              cp ./keys/web/tsa_host_key.pub ./keys/worker
 
       chdir:    /etc/concourse
-    become: true
     register: create_keys
     when: not key_stat.stat.exists
 
@@ -144,20 +157,23 @@
     when: create_keys is defined
 
   - name: Start Concourse
-    ansible.builtin.shell:
-      cmd:      docker-compose up --detach
-      chdir:    /etc/concourse
-    become: true
+    community.docker.docker_compose_v2:
+      project_src:  /etc/concourse
+      state:        present
+      wait:         true
+      wait_timeout: 5
+#   ansible.builtin.shell:
+#     cmd:      docker-compose up --detach
+#     chdir:    /etc/concourse
 
-  - name: Pause to give Concourse enough time to start
-    ansible.builtin.pause:
-      echo:     false
-      seconds:  5
+# - name: Pause to give Concourse enough time to start
+#   ansible.builtin.pause:
+#     echo:     false
+#     seconds:  5
 
   - name: Fetch fly into /usr/local/bin
     ansible.builtin.get_url:
       url: "http://{{ inventory_hostname }}:8080/api/v1/cli?arch=amd64&platform=linux"
       dest: /usr/local/bin/fly
       mode: u=rwx,g=rx,o=rx
-    become: true
 

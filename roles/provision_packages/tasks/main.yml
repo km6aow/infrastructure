@@ -16,12 +16,10 @@
     ansible.builtin.package:
       name: "{{ packages_to_install | list }}"
       state: latest
-    become: true
 
   - name: Reload systemd
     ansible.builtin.systemd:
       daemon_reload: true
-    become: true
 
   - name: Make sure services are started
     ansible.builtin.systemd:
@@ -29,6 +27,5 @@
       enabled: yes
       masked: no
       state: started
-    become: true
     with_items: "{{ services }}"
     when: services is defined and services | length > 0

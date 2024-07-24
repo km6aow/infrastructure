@@ -4,12 +4,6 @@
   - name: Gather Facts
     ansible.builtin.setup:
 
-# - debug:
-#     msg: "nolog stuff: {{ 'false' if lookup('env', 'CI') else 'true' }}"
-
-# - debug:
-#     msg: "grafana admin: {{ grafana_admin_user }} pass: {{ grafana_admin_password }}"
-
   - name: "Check if the grafana group exists"
     ansible.builtin.getent:
       database: group
@@ -28,7 +22,6 @@
       name: "grafana"
       system: true
       state: present
-    become: true
     when: not grafana_group_exists
 
   - name: "Check if the grafana user exists"
@@ -52,7 +45,6 @@
       system: true
       shell: "/bin/false"
       createhome: "false"
-    become: true
     when: not grafana_user_exists
 
   - name: Copy the Grafana configuration
@@ -61,7 +53,6 @@
       dest: /etc
       owner: grafana
       group: grafana
-    become: true
 
   - name: Check installed packages
     ansible.builtin.package_facts:
@@ -110,22 +101,12 @@
       name: grafana.grafana.grafana
     vars:
       grafana_alerting:     {}
-#     grafana_api_keys:
-#       - name:             "admin"
-#         role:             "Admin"
-#       - name:             "viewer"
-#         role:             "Viewer"
-#       - name:             "editor"
-#         role:             "Editor"
       grafana_datasources:
         - name:             "Prometheus"
           type:             "prometheus"
           access: "proxy"
           uid:              "cb3b8c56-f187-4689-9328-ea2119540643"
           url:              "http://{{ aredn_hostname }}:9090"
-#         basicAuth: true
-#         basicAuthUser:        "{{ grafana_admin_user }}"
-#         basicAuthPassword:    "{{ grafana_admin_password }}"
           isDefault: true
           jsonData:
             tlsAuth: false
@@ -136,22 +117,3 @@
         admin_password:     "{{ grafana_admin_password }}"
       grafana_server:
         protocol:           http
-
-# - name: Set up Prometheus Datasource
-#   grafana.grafana.datasource:
-#     dataSource: |
-#       {
-#         "name": "Prometheus",
-#         "type": "prometheus",
-#         "access": "proxy",
-#         "url": "http://localhost:9090",
-#         "jsonData": {
-#           "httpMethod": "POST",
-#           "manageAlerts": true,
-#           "prometheusType": "Prometheus",
-#           "cacheLevel": "High"
-#         }
-#       }
-#     grafana_url: "http://localhost:3000"
-#     grafana_api_key: "{{ grafana_api_key }}"
-#     state: present

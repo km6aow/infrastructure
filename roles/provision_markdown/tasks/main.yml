@@ -14,16 +14,13 @@
       dest: /etc
       owner: root
       group: root
-    become: true
     notify: Restart apache2
 
   - name: Enable external filter module
     ansible.builtin.shell:
       cmd: "a2enmod ext_filter"
-    become: true
 
   - name: Enable markdown
     ansible.builtin.shell:
       cmd: "a2enconf markdown"
-    become: true
     notify: Restart apache2

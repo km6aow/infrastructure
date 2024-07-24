@@ -15,5 +15,4 @@
     ansible.builtin.shell:
       cmd: |
             npm install abort-controller @turf/turf
-    become: true
     register: node_output

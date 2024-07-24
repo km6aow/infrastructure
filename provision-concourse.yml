@@ -1,6 +1,6 @@
     - hosts: all
       gather_facts: false
+      become: true
       roles:
         - provision_postgresql
-        - provision_vault
         - provision_concourse

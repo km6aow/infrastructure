@@ -13,36 +13,10 @@
     vars:
       packages_to_install:
         - dnsmasq
-#       - pxelinux
         - syslinux-common
         - grub-efi-amd64-signed
       services: 
         - dnsmasq
-
-# - name: Disable systemd-resolved
-#   ansible.builtin.systemd:
-#     name: systemd-resolved
-#     state: stopped
-#     masked: true
-#     enabled: false
-#   become: true
-
-# - name: Remove /etc/resolv.conf link
-#   ansible.builtin.file:
-#     name: /etc/resolv.conf
-#     state: absent
-#   become: true
-
-# - name: Create new /etc/resolv.conf
-#   ansible.builtin.copy:
-#     dest: /etc/resolv.conf
-#     owner: root
-#     group: root
-#     mode: u=rw,g=r,o=r
-#     content: |
-#       nameserver 8.8.8.8
-#       nameserver 10.10.1.1
-#   become: true
 
   - name: Make sure various directories exist
     ansible.builtin.file:
@@ -54,8 +28,6 @@
       - '/var/lib/tftpboot'
       - '/var/lib/tftpboot/grub'
       - '/mnt'
-#     - '/var/lib/tftpboot/pxelinux.cfg'
-    become: true
 
   - name: Install /etc/apache2/conf-available/tftp.conf
     ansible.builtin.copy:
@@ -63,12 +35,10 @@
       dest: /etc/
       owner: root
       group: root
-    become: true
 
   - name: Enable tftp path in Apache
     ansible.builtin.shell:
       cmd: "a2enconf tftp"
-    become: true
     notify: Restart apache2
 
   - name: Install /etc/dnsmasq.d/pxe.conf
@@ -77,7 +47,6 @@
       dest: /etc/dnsmasq.d/pxe.conf
       owner: root
       group: root
-    become: true
     notify: Restart dnsmasq
 
   - name: Install Ubuntu Netboot Files
@@ -87,15 +56,6 @@
       remote_src: yes
       extra_opts:
         - "--strip-components=2"
-    become: true
-
-# - name: Install /var/lib/tftpboot/pxelinux.cfg/default
-#   ansible.builtin.template:
-#     src:  "pxelinux.cfg.j2"
-#     dest: /var/lib/tftpboot/pxelinux.cfg/default
-#     owner: root
-#     group: root
-#   become: true
 
   - name: Install /var/lib/tftpboot/grub/grub.cfg
     ansible.builtin.template:
@@ -103,7 +63,6 @@
       dest: /var/lib/tftpboot/grub/grub.cfg
       owner: root
       group: root
-    become: true
 
   - name: See if ISO exists
     ansible.builtin.stat:
@@ -125,7 +84,6 @@
       url: "{{ ubuntu_iso }}"
       dest: /var/lib/tftpboot
     when: must_download == true
-    become: true
 
   - name: Mount the ISO
     ansible.posix.mount:
@@ -134,7 +92,6 @@
       fstype: iso9660
       opts: ro,noauto
       state: mounted
-    become: true
     notify: Unmount the ISO
 
   - name: Copy required files
@@ -144,10 +101,8 @@
       dest: /var/lib/tftpboot
       owner: root
       group: root
-    become: true
     with_items:
       - /mnt/EFI/boot/bootx64.efi
-#     - /mnt/EFI/boot/grubx64.efi
       - /mnt/casper/initrd
       - /usr/lib/syslinux/modules/bios/ldlinux.c32
       - /mnt/casper/vmlinuz
@@ -159,7 +114,6 @@
       dest: /var/lib/tftpboot/grubx64.efi
       owner: root
       group: root
-    become: true
 
   - name: Install /var/lib/tftpboot/user-data
     ansible.builtin.template:
@@ -167,7 +121,6 @@
       dest: /var/lib/tftpboot/user-data
       owner: root
       group: root
-    become: true
 
   - name: Install /var/lib/tftpboot/{meta-data,vendor-data}
     ansible.builtin.file:
@@ -176,4 +129,3 @@
     with_items:
       - /var/lib/tftpboot/meta-data
       - /var/lib/tftpboot/vendor-data
-    become: true

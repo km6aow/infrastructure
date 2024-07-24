@@ -4,7 +4,6 @@
     community.general.snap:
       name:
         - vault
-    become: true
 
   - name: "Check if the vault group exists"
     ansible.builtin.getent:
@@ -32,7 +31,6 @@
     ansible.builtin.group:
       name:     "vault"
       state:    present
-    become:     true
     when:       not vault_group_exists
 
   - name: "Check if the vault user exists"
@@ -53,7 +51,6 @@
       system:     true
       shell:      "/bin/false"
       createhome: "false"
-    become:       true
     when:         not vault_user_exists
 
   - name: Make sure the aredn user is in the vault group
@@ -62,78 +59,72 @@
       groups:     "vault"
       state:      present
       append:     yes
-    become:       true
     when:         not aredn_in_vault_group
 
   - name: Make sure vault is running
-    ignore_errors: true
-    ansible.builtin.shell:
-      cmd: "pgrep vault"
-    register: vault_pid
+    community.docker.docker_container_info:
+      name: vault
+    register: vault_status
 
   - set_fact:
-      vault_running: false
-
-  - set_fact:
-      vault_running: true
-    when: vault_pid.stdout | int > 0
+      vault_running: "{{ vault_status.exists and vault_status.container.State.Running }}"
 
   - name: Stop vault if it is running
-    ansible.builtin.shell:
-      cmd: "docker stop vault"
+    community.docker.docker_container:
+      state: absent
+      name:  vault
     when: vault_running == true
-    become: true
-
-  - name: Preemptive remove the container
-    ignore_errors: true
-    ansible.builtin.shell:
-      cmd: "docker rm vault"
-    become: true
 
   - name: Fetch or update the container
-    ansible.builtin.shell:
-      cmd: "docker pull hashicorp/vault"
-    become: true
+    community.docker.docker_image_pull:
+      docker_host:  "unix:///run/docker.sock"
+      name:         hashicorp/vault
 
-  - name: Make sure /vault exist
+  - name: Make sure /vault and friends exist
     ansible.builtin.file:
       path: "{{ item }}"
       owner: vault
       group: vault
       state: directory
       mode: u=rwx,g=rx
-    become: true
     with_items:
       - /vault/config
       - /vault/data
       - /vault/file
       - /vault/logs
+      - /vault/policies
 
-  - name: Install /vault/config/vault.hcl
-    ansible.builtin.template:
-      src:  "vault.hcl.j2"
-      dest: /vault/config/vault.hcl
-      owner: vault
-      group: vault
-    become: true
+  - name: Copy the configuration and policy files
+    ansible.builtin.copy:
+      src:          files/vault/
+      dest:         /vault
+      owner:        vault
+      group:        vault
 
-  - name: Start the container
-    ansible.builtin.shell: |
-        docker run --detach \
-          --cap-add IPC_LOCK \
-          --restart=unless-stopped \
-          --publish 8200:8200 \
-          --publish 8201:8201 \
-          --volume=/vault:/vault \
-          --volume=/vault/file:/vault/file \
-          --name=vault \
-          hashicorp/vault server 
-    become: true
+  - name: Start the vault container
+    community.docker.docker_container:
+      capabilities:
+        - ipc_lock
+      command:          server
+      image:            hashicorp/vault
+      name:             vault
+      ports:
+        - "8200:8200"
+        - "8201:8201"
+      restart_policy:   "unless-stopped"
+      state:            started
+      volumes:
+        - /vault:/vault
+        - /vault/file:/vault/file
+    register: vault_status
 
-  - name: Pause to give the container enough time to start
-    ansible.builtin.pause:
-      echo:     false
-      seconds:  5
+  - name: Wait for the container to be healty
+    community.docker.docker_container_info:
+      name:     vault
+    until:      vault_status.container.State.Running
+    register:   vault_status
+    retries:    15
+    delay:      10
 
   - name: See if the vault has been initialized
     ansible.builtin.shell: |
@@ -176,16 +167,10 @@
           "key3":   "{{ vault_key3 }}",
           "token":  "{{ vault_token }}"
         }
-    become: true
-    when: not vault_initialized
-
-  - name: Fix permissions on /vault_keys
-    ansible.builtin.file:
-      path: /vault_keys
       owner: root
-      group: root
-      mode:  u+rw
-    become: true
+      group: vault
+      mode:  0640
+    when: not vault_initialized
 
   - name: Unseal the vault if needed
     ansible.builtin.include_tasks: unseal_vault.yml
@@ -194,10 +179,8 @@
   - name: Create concourse policy
     ansible.builtin.shell: |
         export VAULT_ADDR="http://{{ inventory_hostname }}:8200"
-        export VAULT_TOKEN="{{ token }}"
-        vault policy write concourse /vault/policies/concourse.hcl 
-    become: true
-    when: not vault_initialized
+        export VAULT_TOKEN="{{ vault_token }}"
+        cat /vault/policies/concourse.hcl | vault policy write concourse -
 
   - debug:
       msg: |
